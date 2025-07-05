@@ -1,5 +1,5 @@
 import path from "node:path";
-import { Component, Description, Item as item } from "./types/item.js";
+import { Category, Component, Group, Item as item } from "./types/item.js";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -14,7 +14,6 @@ export class Item {
       components: {},
     },
   };
-  private description: boolean = false;
   constructor() {
     if (Item.classCalled) {
       fs.rmSync(path.join(__dirname, "../../item.json"), {
@@ -34,13 +33,24 @@ export class Item {
       throw new Error("item class can only be called in files .item.ts");
     Item.classCalled = true;
   }
-  setDescription({ identifier, menu_category, is_experimental }: Description) {
-    if (this.description)
-      throw new Error("setDescription can only be called once per item.");
-    this.data["minecraft:item"].description.identifier = identifier;
-    this.data["minecraft:item"].description.menu_category = menu_category;
-    this.data["minecraft:item"].description.is_experimental = is_experimental;
-    this.description = true;
+  setIdentifier(value: string) {
+    this.data["minecraft:item"].description.identifier = value;
+    return this;
+  }
+  setMenuCategory(
+    category: Category,
+    group?: Group,
+    is_hidden_in_commands?: boolean
+  ) {
+    this.data["minecraft:item"].description.menu_category = {
+      category,
+      group,
+      is_hidden_in_commands,
+    };
+    return this;
+  }
+  setIsExperimental(value: boolean) {
+    this.data["minecraft:item"].description.is_experimental = value;
     return this;
   }
   addComponent<Item extends keyof Component | (string & {})>(
@@ -48,8 +58,6 @@ export class Item {
     // @ts-expect-error
     value: Component[Item]
   ) {
-    // @ts-expect-error
-    this.data["minecraft:item"].components[name] = {};
     // @ts-expect-error
     this.data["minecraft:item"].components[name] = value;
     return this;

@@ -3,10 +3,13 @@ import fs from "node:fs";
 import type {
   Component,
   ComponentGroups,
-  Description,
   Events,
   EntityBehavior,
   EIHEventBase,
+  SpawnCategory,
+  Scripts,
+  Animate,
+  Experimental,
 } from "./types/entity.js";
 import { fileURLToPath } from "node:url";
 
@@ -22,7 +25,6 @@ export class Entity {
       components: {},
     },
   };
-  private description: boolean = false;
   constructor() {
     if (Entity.classCalled) {
       fs.rmSync(path.join(__dirname, "../../entity.json"), {
@@ -42,39 +44,57 @@ export class Entity {
       throw new Error("entity class can only be called in files .entity.ts");
     Entity.classCalled = true;
   }
-  setDescription({
-    identifier,
-    animations,
-    is_experimental,
-    is_spawnable,
-    is_summonable,
-    properties,
-    runtime_identifier,
-    scripts,
-    spawn_category,
-  }: Description) {
-    if (this.description)
-      throw new Error("setDescription can only be called once per entity.");
-    this.data["minecraft:entity"].description.identifier = identifier;
-    this.data["minecraft:entity"].description.animations = animations;
-    this.data["minecraft:entity"].description.is_experimental = is_experimental;
-    this.data["minecraft:entity"].description.is_spawnable = is_spawnable;
-    this.data["minecraft:entity"].description.is_summonable = is_summonable;
-    this.data["minecraft:entity"].description.properties = properties;
-    this.data["minecraft:entity"].description.runtime_identifier =
-      runtime_identifier;
-    this.data["minecraft:entity"].description.scripts = scripts;
-    this.data["minecraft:entity"].description.spawn_category = spawn_category;
-    this.description = true;
+  setIdentifier(value: string) {
+    this.data["minecraft:entity"].description.identifier = value;
     return this;
   }
-  addComponentGroup<Entity extends keyof ComponentGroups | (string & {})>(
+  setSpawnable(value: boolean) {
+    this.data["minecraft:entity"].description.is_spawnable = value;
+    return this;
+  }
+  setSummonable(value: boolean) {
+    this.data["minecraft:entity"].description.is_summonable = value;
+    return this;
+  }
+  setIsExperimental(value: boolean) {
+    this.data["minecraft:entity"].description.is_experimental = value;
+    return this;
+  }
+  setSpawnCategory(value: SpawnCategory) {
+    this.data["minecraft:entity"].description.spawn_category = value;
+    return this;
+  }
+  setRuntimeIdentifier(value: string) {
+    this.data["minecraft:entity"].description.runtime_identifier = value;
+    return this;
+  }
+  addProperties<Property extends string>(
+    name: Property,
+    value: Experimental[Property]
+  ) {
+    this.data["minecraft:entity"].description.properties = {};
+    this.data["minecraft:entity"].description.properties[name] = value;
+    return this;
+  }
+  addAnimations(name: string, value: string) {
+    this.data["minecraft:entity"].description.animations = {};
+    this.data["minecraft:entity"].description.animations[name] = value;
+    return this;
+  }
+  addScript<Script extends keyof Scripts | (string & {})>(
+    name: Script,
+    value: Script extends keyof Scripts ? Animate : any
+  ) {
+    this.data["minecraft:entity"].description.scripts = {};
+    // @ts-expect-error
+    this.data["minecraft:entity"].description.scripts[name] = value;
+    return this;
+  }
+  addComponentGroup<Entity extends keyof ComponentGroups>(
     name: Entity,
     value: ComponentGroups[Entity]
   ) {
-    // @ts-expect-error
-    this.data["minecraft:entity"].component_groups[name] = {};
-    // @ts-expect-error
+    this.data["minecraft:entity"].component_groups = {};
     this.data["minecraft:entity"].component_groups[name] = value;
     return this;
   }
@@ -84,8 +104,6 @@ export class Entity {
     value: Component[Entity]
   ) {
     // @ts-expect-error
-    this.data["minecraft:entity"].components[name] = {};
-    // @ts-expect-error
     this.data["minecraft:entity"].components[name] = value;
     return this;
   }
@@ -94,8 +112,7 @@ export class Entity {
     // @ts-expect-error
     value: Entity extends Events ? Events[Entity] : EIHEventBase
   ) {
-    // @ts-expect-error
-    this.data["minecraft:entity"].events[name] = {};
+    this.data["minecraft:entity"].events = {};
     // @ts-expect-error
     this.data["minecraft:entity"].events[name] = value;
     return this;

@@ -1,9 +1,13 @@
 import { fileURLToPath } from "node:url";
 import {
-  BlockDescription,
   Component,
-  Permutation,
   BlockBehavior,
+  Category,
+  Group,
+  Traits,
+  State,
+  Condition,
+  Component1,
 } from "./types/block.js";
 import path from "node:path";
 import fs from "node:fs";
@@ -20,7 +24,6 @@ export class Block {
       components: {},
     },
   };
-  private description: boolean = false;
   constructor() {
     if (Block.classCalled) {
       fs.rmSync(path.join(__dirname, "../../block.json"), {
@@ -40,19 +43,29 @@ export class Block {
       throw new Error("block class can only be called in files .block.ts");
     Block.classCalled = true;
   }
-  setDescription({
-    identifier,
-    menu_category,
-    states,
-    traits,
-  }: BlockDescription) {
-    if (this.description)
-      throw new Error("setDescription can only be called once per block.");
-    this.data["minecraft:block"].description.identifier = identifier;
-    this.data["minecraft:block"].description.menu_category = menu_category;
-    this.data["minecraft:block"].description.states = states;
-    this.data["minecraft:block"].description.traits = traits;
-    this.description = true;
+  setIdentifier(value: string) {
+    this.data["minecraft:block"].description.identifier = value;
+    return this;
+  }
+  setMenuCategory(
+    category: Category,
+    group?: Group,
+    is_hidden_in_commands?: boolean
+  ) {
+    this.data["minecraft:block"].description.menu_category = {
+      category,
+      group,
+      is_hidden_in_commands,
+    };
+    return this;
+  }
+  setTraits(value: Traits) {
+    this.data["minecraft:block"].description.traits = value;
+    return this;
+  }
+  addState(name: string, value: State) {
+    this.data["minecraft:block"].description.states = {};
+    this.data["minecraft:block"].description.states[name] = value;
     return this;
   }
   addComponent<Block extends keyof Component | (string & {})>(
@@ -61,15 +74,13 @@ export class Block {
     value: Component[Block]
   ) {
     // @ts-expect-error
-    this.data["minecraft:block"].components[name] = {};
-    // @ts-expect-error
     this.data["minecraft:block"].components[name] = value;
     return this;
   }
-  addPermumation({ components, condition }: Permutation) {
+  addPermutation(condition: Condition, components: Component1) {
     this.data["minecraft:block"].permutations = [
       ...this.data["minecraft:block"].permutations!,
-      { components, condition },
+      { condition, components },
     ];
     return this;
   }
