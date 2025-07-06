@@ -1,7 +1,8 @@
 import path from "node:path";
-import { Category, Component, Group, Item as item } from "./types/item.js";
+import { Category, Component, Group, Item as item } from "./types/item/item.js";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
+import { ItemTextureFile } from "./types/item/item_texture.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,6 +14,11 @@ export class Item {
       description: {},
       components: {},
     },
+  };
+  private item_texture: ItemTextureFile = {
+    resource_pack_name: "@scriptmc",
+    texture_name: "atlas.items",
+    texture_data: {},
   };
   constructor() {
     if (Item.classCalled) {
@@ -34,6 +40,8 @@ export class Item {
     Item.classCalled = true;
   }
   setIdentifier(value: string) {
+    if (!value.match(/[a-zA-Z]+:\w+/))
+      throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
     this.data["minecraft:item"].description.identifier = value;
     return this;
   }
@@ -53,6 +61,11 @@ export class Item {
     this.data["minecraft:item"].description.is_experimental = value;
     return this;
   }
+  setTexture(name: string, value: string) {
+    this.item_texture.texture_data = {};
+    this.item_texture.texture_data[name] = { textures: value };
+    return this;
+  }
   addComponent<Item extends keyof Component | (string & {})>(
     name: Item,
     // @ts-expect-error
@@ -67,6 +80,11 @@ export class Item {
       fs.writeFileSync(
         path.join(__dirname, "../../item.json"),
         JSON.stringify(this.data)
+      );
+      if (Object.keys(this.item_texture.texture_data!).length <= 0) return;
+      fs.writeFileSync(
+        path.join(__dirname, "../../item_texture.json"),
+        JSON.stringify(this.item_texture)
       );
     } catch (err) {
       console.error(err);

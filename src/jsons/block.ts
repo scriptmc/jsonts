@@ -8,9 +8,11 @@ import {
   State,
   Condition,
   Component1,
-} from "./types/block.js";
+} from "./types/block/block.js";
 import path from "node:path";
 import fs from "node:fs";
+import { TerrainTextureFile } from "./types/block/terrain_texture.js";
+import { Block as block } from "./types/block/blocks.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,6 +26,12 @@ export class Block {
       components: {},
     },
   };
+  private terrain_texture: TerrainTextureFile = {
+    resource_pack_name: "@scriptmc",
+    texture_name: "atlas.terrain",
+    texture_data: {},
+  };
+  private blocks: { [key: string]: object } = {};
   constructor() {
     if (Block.classCalled) {
       fs.rmSync(path.join(__dirname, "../../block.json"), {
@@ -44,6 +52,8 @@ export class Block {
     Block.classCalled = true;
   }
   setIdentifier(value: string) {
+    if (!value.match(/[a-zA-Z]+:\w+/))
+      throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
     this.data["minecraft:block"].description.identifier = value;
     return this;
   }
@@ -63,9 +73,23 @@ export class Block {
     this.data["minecraft:block"].description.traits = value;
     return this;
   }
+  addTexture(name: string, value: string) {
+    if (!Object.keys(this.terrain_texture).includes("texture_data"))
+      this.terrain_texture.texture_data = {};
+    this.terrain_texture.texture_data![name] = { textures: value };
+    return this;
+  }
+  setBlock(name: string, value: block) {
+    this.blocks = {};
+    this.blocks[name] = value;
+    return this;
+  }
   addState(name: string, value: State) {
-    this.data["minecraft:block"].description.states = {};
-    this.data["minecraft:block"].description.states[name] = value;
+    if (
+      !Object.keys(this.data["minecraft:block"].description).includes("states")
+    )
+      this.data["minecraft:block"].description.states = {};
+    this.data["minecraft:block"].description.states![name] = value;
     return this;
   }
   addComponent<Block extends keyof Component | (string & {})>(
@@ -78,10 +102,9 @@ export class Block {
     return this;
   }
   addPermutation(condition: Condition, components: Component1) {
-    this.data["minecraft:block"].permutations = [
-      ...this.data["minecraft:block"].permutations!,
-      { condition, components },
-    ];
+    if (!Object.keys(this.data["minecraft:block"]).includes("permutations"))
+      this.data["minecraft:block"].permutations = [];
+    this.data["minecraft:block"].permutations?.push({ condition, components });
     return this;
   }
   async create() {
@@ -89,6 +112,16 @@ export class Block {
       fs.writeFileSync(
         path.join(__dirname, "../../block.json"),
         JSON.stringify(this.data)
+      );
+      if (Object.keys(this.terrain_texture.texture_data!).length <= 0) return;
+      fs.writeFileSync(
+        path.join(__dirname, "../../terrain_texture.json"),
+        JSON.stringify(this.terrain_texture)
+      );
+      if (Object.keys(this.blocks).length <= 0) return;
+      fs.writeFileSync(
+        path.join(__dirname, "../../blocks.json"),
+        JSON.stringify(this.blocks)
       );
     } catch (err) {
       console.error(err);
