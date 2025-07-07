@@ -21,10 +21,14 @@ export class Item {
   };
   private name: string = "";
   setIdentifier(value: string) {
-    if (!value.match(/[a-zA-Z]+:\w+/))
+    if (!value.match(/[a-zA-Z]+:\w+|@name<\w+>/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
-    this.name = value.replace(":", "_");
-    this.data["minecraft:item"].description.identifier = value;
+    this.name = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1].replace(":", "_")
+      : value.replace(":", "_");
+    this.data["minecraft:item"].description.identifier = value
+      .replace(/@name[<]/g, "")
+      .replace(/[>]/g, "");
     return this;
   }
   setMenuCategory(
@@ -60,8 +64,10 @@ export class Item {
   async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
+      if (!fs.existsSync(path.join(__dirname, "../../executes/beh/items")))
+        fs.mkdirSync(path.join(__dirname, "../../executes/beh/items"));
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}.item.json`),
+        path.join(__dirname, `../../executes/beh/items/${this.name}.json`),
         JSON.stringify(this.data)
       );
       if (Object.keys(this.item_texture.texture_data!).length <= 0) return;

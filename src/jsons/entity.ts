@@ -45,11 +45,17 @@ export class Entity {
   };
   private name: string = "";
   setIdentifier(value: string) {
-    if (!value.match(/^[a-zA-Z]+:\w+$/))
+    if (!value.match(/[a-zA-Z]+:\w+|@name<\w+>/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
-    this.name = value.replace(":", "_");
-    this.dataBP["minecraft:entity"].description.identifier = value;
-    this.dataRP["minecraft:client_entity"].description.identifier = value;
+    this.name = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1].replace(":", "_")
+      : value.replace(":", "_");
+    this.dataBP["minecraft:entity"].description.identifier = value
+      .replace(/@name[<]/g, "")
+      .replace(/[>]/g, "");
+    this.dataRP["minecraft:client_entity"].description.identifier = value
+      .replace(/@name[<]/g, "")
+      .replace(/[>]/g, "");
     return this;
   }
   setSpawnable(value: boolean) {
@@ -286,8 +292,10 @@ export class Entity {
   async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
+      if (!fs.existsSync(path.join(__dirname, "../../executes/beh/entities")))
+        fs.mkdirSync(path.join(__dirname, "../../executes/beh/entities"));
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}.entity.json`),
+        path.join(__dirname, `../../executes/beh/entities/${this.name}.json`),
         JSON.stringify(this.dataBP)
       );
       if (
@@ -295,8 +303,10 @@ export class Entity {
           .length <= 0
       )
         return;
+      if (!fs.existsSync(path.join(__dirname, "../../executes/reh/entity")))
+        fs.mkdirSync(path.join(__dirname, "../../executes/reh/entity"));
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}.entity-rp.json`),
+        path.join(__dirname, `../../executes/reh/entity/${this.name}.json`),
         JSON.stringify(this.dataRP)
       );
     } catch (err) {
@@ -306,40 +316,22 @@ export class Entity {
 }
 
 export class RenderController {
-  private static classCalled: boolean = false;
   private data: RenderControllers = {
     format_version: "1.10.0",
     render_controllers: {},
   };
   private name: string = "";
-  constructor() {
-    if (RenderController.classCalled) {
-      fs.rmSync(path.join(__dirname, "../../entity-render.json"), {
-        force: true,
-        recursive: true,
-      });
-      throw new Error(
-        "You can only create one instance of RenderController using `new Entity()`."
-      );
-    }
-    const err = new Error();
-    const stack = err.stack?.split("\n")[2] ?? "";
-    const match =
-      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
-    const filePath = match?.[1];
-    if (!filePath?.endsWith(".entity.js"))
-      throw new Error(
-        "render_controller class can only be called in files .entity.ts"
-      );
-    RenderController.classCalled = true;
-  }
+  private fileName: string = "";
   setIdentifier(value: string) {
-    if (!value.match(/^controller\.render\.\w+$/))
-      throw new Error(
-        `Identifier "${value}" invalid. ex: "controller.render.name"`
-      );
-    this.name = value;
-    this.data["render_controllers"]![value] = {};
+    if (!value.match(/controller\.render\.\w+|@name<\w+>/))
+      throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
+    this.fileName = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1]
+      : value;
+    this.name = value.replace(/@name[<]/g, "").replace(/[>]/g, "");
+    this.data.render_controllers![
+      value.replace(/@name[<]/g, "").replace(/[>]/g, "")
+    ] = {};
     return this;
   }
   setGeometry(value: string) {
@@ -435,8 +427,19 @@ export class RenderController {
   async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
+      if (
+        !fs.existsSync(
+          path.join(__dirname, "../../executes/reh/render_controllers")
+        )
+      )
+        fs.mkdirSync(
+          path.join(__dirname, "../../executes/reh/render_controllers")
+        );
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}.entity-render.json`),
+        path.join(
+          __dirname,
+          `../../executes/reh/render_controllers/${this.fileName}.json`
+        ),
         JSON.stringify(this.data)
       );
     } catch (err) {

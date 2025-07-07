@@ -33,10 +33,14 @@ export class Block {
   private blocks: { [key: string]: object } = {};
   private name: string = "";
   setIdentifier(value: string) {
-    if (!value.match(/[a-zA-Z]+:\w+/))
+    if (!value.match(/[a-zA-Z]+:\w+|@name<\w+>/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
-    this.name = value.replace(":", "_");
-    this.data["minecraft:block"].description.identifier = value;
+    this.name = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1].replace(":", "_")
+      : value.replace(":", "_");
+    this.data["minecraft:block"].description.identifier = value
+      .replace(/@name[<]/g, "")
+      .replace(/[>]/g, "");
     return this;
   }
   setMenuCategory(
@@ -92,18 +96,23 @@ export class Block {
   async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
+      if (!fs.existsSync(path.join(__dirname, "../../executes/beh/blocks")))
+        fs.mkdirSync(path.join(__dirname, "../../executes/beh/blocks"));
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}block.json`),
+        path.join(__dirname, `../../executes/beh/blocks/${this.name}.json`),
         JSON.stringify(this.data)
       );
       if (Object.keys(this.terrain_texture.texture_data!).length <= 0) return;
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}terrain_texture.json`),
+        path.join(
+          __dirname,
+          `../../executes/${this.name}.terrain_texture.json`
+        ),
         JSON.stringify(this.terrain_texture)
       );
       if (Object.keys(this.blocks).length <= 0) return;
       fs.writeFileSync(
-        path.join(__dirname, `../../executes/${this.name}blocks.json`),
+        path.join(__dirname, `../../executes/${this.name}.blocks.json`),
         JSON.stringify(this.blocks)
       );
     } catch (err) {
