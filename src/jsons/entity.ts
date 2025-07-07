@@ -29,7 +29,6 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class Entity {
-  private static classCalled: boolean = false;
   private dataBP: EntityBehavior = {
     format_version: "1.21.90",
     "minecraft:entity": {
@@ -44,28 +43,11 @@ export class Entity {
       description: {},
     },
   };
-  constructor() {
-    if (Entity.classCalled) {
-      fs.rmSync(path.join(__dirname, "../../entity.json"), {
-        force: true,
-        recursive: true,
-      });
-      throw new Error(
-        "You can only create one instance of Entity using `new Entity()`."
-      );
-    }
-    const err = new Error();
-    const stack = err.stack?.split("\n")[2] ?? "";
-    const match =
-      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
-    const filePath = match?.[1];
-    if (!filePath?.endsWith(".entity.js"))
-      throw new Error("entity class can only be called in files .entity.ts");
-    Entity.classCalled = true;
-  }
+  private name: string = "";
   setIdentifier(value: string) {
     if (!value.match(/^[a-zA-Z]+:\w+$/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
+    this.name = value.replace(":", "_");
     this.dataBP["minecraft:entity"].description.identifier = value;
     this.dataRP["minecraft:client_entity"].description.identifier = value;
     return this;
@@ -219,10 +201,16 @@ export class Entity {
     return this;
   }
   addRenderController(value: string) {
-    this.dataRP["minecraft:client_entity"].description.render_controllers = [
-      ...this.dataRP["minecraft:client_entity"].description.render_controllers!,
-      value,
-    ];
+    if (
+      !Object.keys(this.dataRP["minecraft:client_entity"].description).includes(
+        "render_controllers"
+      )
+    )
+      this.dataRP["minecraft:client_entity"].description.render_controllers =
+        [];
+    this.dataRP["minecraft:client_entity"].description.render_controllers?.push(
+      value
+    );
     return this;
   }
   addProperties<Property extends string>(
@@ -297,8 +285,9 @@ export class Entity {
   }
   async create() {
     try {
+      if (!this.name) throw new Error("Identifier not found.");
       fs.writeFileSync(
-        path.join(__dirname, "../../entity.json"),
+        path.join(__dirname, `../../executes/${this.name}.entity.json`),
         JSON.stringify(this.dataBP)
       );
       if (
@@ -307,7 +296,7 @@ export class Entity {
       )
         return;
       fs.writeFileSync(
-        path.join(__dirname, "../../entity-rp.json"),
+        path.join(__dirname, `../../executes/${this.name}.entity-rp.json`),
         JSON.stringify(this.dataRP)
       );
     } catch (err) {
@@ -445,8 +434,9 @@ export class RenderController {
   }
   async create() {
     try {
+      if (!this.name) throw new Error("Identifier not found.");
       fs.writeFileSync(
-        path.join(__dirname, "../../entity-render.json"),
+        path.join(__dirname, `../../executes/${this.name}.entity-render.json`),
         JSON.stringify(this.data)
       );
     } catch (err) {

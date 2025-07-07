@@ -7,7 +7,6 @@ import { ItemTextureFile } from "./types/item/item_texture.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class Item {
-  private static classCalled: boolean = false;
   private data: item = {
     format_version: "1.21.90",
     "minecraft:item": {
@@ -20,28 +19,11 @@ export class Item {
     texture_name: "atlas.items",
     texture_data: {},
   };
-  constructor() {
-    if (Item.classCalled) {
-      fs.rmSync(path.join(__dirname, "../../item.json"), {
-        force: true,
-        recursive: true,
-      });
-      throw new Error(
-        "You can only create one instance of Item using `new Item()`."
-      );
-    }
-    const err = new Error();
-    const stack = err.stack?.split("\n")[2] ?? "";
-    const match =
-      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
-    const filePath = match?.[1];
-    if (!filePath?.endsWith(".item.js"))
-      throw new Error("item class can only be called in files .item.ts");
-    Item.classCalled = true;
-  }
+  private name: string = "";
   setIdentifier(value: string) {
     if (!value.match(/[a-zA-Z]+:\w+/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
+    this.name = value.replace(":", "_");
     this.data["minecraft:item"].description.identifier = value;
     return this;
   }
@@ -77,13 +59,14 @@ export class Item {
   }
   async create() {
     try {
+      if (!this.name) throw new Error("Identifier not found.");
       fs.writeFileSync(
-        path.join(__dirname, "../../item.json"),
+        path.join(__dirname, `../../executes/${this.name}.item.json`),
         JSON.stringify(this.data)
       );
       if (Object.keys(this.item_texture.texture_data!).length <= 0) return;
       fs.writeFileSync(
-        path.join(__dirname, "../../item_texture.json"),
+        path.join(__dirname, `../../executes/${this.name}.item_texture.json`),
         JSON.stringify(this.item_texture)
       );
     } catch (err) {

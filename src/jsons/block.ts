@@ -17,7 +17,6 @@ import { Block as block } from "./types/block/blocks.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class Block {
-  private static classCalled: boolean = false;
   private data: BlockBehavior = {
     format_version: "1.21.90",
     "minecraft:block": {
@@ -32,28 +31,11 @@ export class Block {
     texture_data: {},
   };
   private blocks: { [key: string]: object } = {};
-  constructor() {
-    if (Block.classCalled) {
-      fs.rmSync(path.join(__dirname, "../../block.json"), {
-        force: true,
-        recursive: true,
-      });
-      throw new Error(
-        "You can only create one instance of Block using `new Block()`."
-      );
-    }
-    const err = new Error();
-    const stack = err.stack?.split("\n")[2] ?? "";
-    const match =
-      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
-    const filePath = match?.[1];
-    if (!filePath?.endsWith(".block.js"))
-      throw new Error("block class can only be called in files .block.ts");
-    Block.classCalled = true;
-  }
+  private name: string = "";
   setIdentifier(value: string) {
     if (!value.match(/[a-zA-Z]+:\w+/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
+    this.name = value.replace(":", "_");
     this.data["minecraft:block"].description.identifier = value;
     return this;
   }
@@ -109,18 +91,19 @@ export class Block {
   }
   async create() {
     try {
+      if (!this.name) throw new Error("Identifier not found.");
       fs.writeFileSync(
-        path.join(__dirname, "../../block.json"),
+        path.join(__dirname, `../../executes/${this.name}block.json`),
         JSON.stringify(this.data)
       );
       if (Object.keys(this.terrain_texture.texture_data!).length <= 0) return;
       fs.writeFileSync(
-        path.join(__dirname, "../../terrain_texture.json"),
+        path.join(__dirname, `../../executes/${this.name}terrain_texture.json`),
         JSON.stringify(this.terrain_texture)
       );
       if (Object.keys(this.blocks).length <= 0) return;
       fs.writeFileSync(
-        path.join(__dirname, "../../blocks.json"),
+        path.join(__dirname, `../../executes/${this.name}blocks.json`),
         JSON.stringify(this.blocks)
       );
     } catch (err) {
