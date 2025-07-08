@@ -16,6 +16,43 @@ import { Block as block } from "./types/block/blocks.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @class Block
+ * @example
+ * ```ts
+ * import { Block } from "@scriptmc/jsonts";
+ *
+ * const block = new Block();
+ *
+ * block.setIdentifier("id:name");
+ * block.setMenuCategory("construction");
+ * block.addState("custom:is_lit", [true, false]);
+ *
+ * block.addComponent("minecraft:friction", 0.6);
+ * block.addComponent("minecraft:map_color", "#00FF00");
+ *
+ * block.addPermutation(`query.block_state("custom:is_lit") == true`, {
+ *  "minecraft:light_emission": 15,
+ * });
+ * block.addPermutation(`query.block_state("custom:is_lit") == false`, {
+ *  "minecraft:light_emission": 0,
+ * });
+ *
+ * block.addTexture("blockTextureUp", "textures/blocks/block_texture_up");
+ * block.addTexture("blockTextureDown", "textures/blocks/block_texture_down");
+ * block.addTexture("blockTextureSide", "textures/blocks/block_texture_side");
+ *
+ * block.setBlock("blockTexture", {
+ *  textures: {
+ *    up: "blockTextureUp",
+ *    down: "blockTextureDown",
+ *    side: "blockTextureSide",
+ *  },
+ * });
+ *
+ * block.create();
+ * ```
+ */
 export class Block {
   private data: BlockBehavior = {
     format_version: "1.21.90",
@@ -32,6 +69,16 @@ export class Block {
   };
   private blocks: { [key: string]: object } = {};
   private name: string = "";
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.setIdentifier("id:name");
+   * block.create();
+   * ```
+   */
   setIdentifier(value: string) {
     if (!value.match(/[a-zA-Z]+:\w+|@name<\w+>/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
@@ -43,6 +90,18 @@ export class Block {
       .replace(/[>]/g, "");
     return this;
   }
+  /**
+   * @param category Category <string>
+   * @param group Group <string> (optional)
+   * @param is_hidden_in_commands boolean (optional)
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.setMenuCategory("construction", "itemGroup.name.anvil");
+   * block.create();
+   * ```
+   */
   setMenuCategory(
     category: Category,
     group?: Group,
@@ -55,21 +114,83 @@ export class Block {
     };
     return this;
   }
+  /**
+   * @param value Traits <object>
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.setTraits({
+   *  "minecraft:placement_direction": {
+   *      enabled_states: [
+   *          "minecraft:cardinal_direction",
+   *          "minecraft:facing_direction",
+   *      ],
+   *      y_rotation_offset: 0,
+   *  },
+   *  "minecraft:placement_position": {
+   *      enabled_states: ["minecraft:block_face", "minecraft:vertical_half"],
+   *  },
+   * });
+   * block.create();
+   * ```
+   */
   setTraits(value: Traits) {
     this.data["minecraft:block"].description.traits = value;
     return this;
   }
+  /**
+   * @param name string
+   * @param value string
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.addTexture("block_up", "textures/blocks/block_up");
+   * block.addTexture("block_down", "textures/blocks/block_down");
+   * block.addTexture("block_side", "textures/blocks/block_side");
+   * block.create();
+   * ```
+   */
   addTexture(name: string, value: string) {
     if (!Object.keys(this.terrain_texture).includes("texture_data"))
       this.terrain_texture.texture_data = {};
     this.terrain_texture.texture_data![name] = { textures: value };
     return this;
   }
+  /**
+   * @param name string
+   * @param value Block <object>
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.setBlock("block", {
+   *  textures: {
+   *    up: "block_up",
+   *    down: "block_down",
+   *    side: "block_side"
+   *  }
+   * });
+   * block.create();
+   * ```
+   */
   setBlock(name: string, value: block) {
     this.blocks = {};
     this.blocks[name] = value;
     return this;
   }
+  /**
+   * @param name string
+   * @param value State <Array | Object>
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.addState("state:custom_state", [true, false]);
+   * block.create();
+   * ```
+   */
   addState(name: string, value: State) {
     if (
       !Object.keys(this.data["minecraft:block"].description).includes("states")
@@ -78,6 +199,18 @@ export class Block {
     this.data["minecraft:block"].description.states![name] = value;
     return this;
   }
+  /**
+   * @param name Component <string>
+   * @param value Component[name]
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.addComponent("minecraft:friction", 0.6);
+   * block.addComponent("minecraft:map_color", "#00FF00");
+   * block.create();
+   * ```
+   */
   addComponent<Block extends keyof Component | (string & {})>(
     name: Block,
     // @ts-expect-error
@@ -87,6 +220,22 @@ export class Block {
     this.data["minecraft:block"].components[name] = value;
     return this;
   }
+  /**
+   * @param condition Condition <string>
+   * @param components Component1 <object>
+   * @example
+   * ```ts
+   * import { Block } from "@scriptmc/jsonts";
+   * const block = new Block();
+   * block.addPermutation(`query.block_state("custom:is_lit") == true`, {
+   *  "minecraft:light_emission": 15,
+   * });
+   * block.addPermutation(`query.block_state("custom:is_lit") == false`, {
+   *  "minecraft:light_emission": 0,
+   * });
+   * block.create();
+   * ```
+   */
   addPermutation(condition: Condition, components: Component1) {
     if (!Object.keys(this.data["minecraft:block"]).includes("permutations"))
       this.data["minecraft:block"].permutations = [];

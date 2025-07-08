@@ -6,6 +6,25 @@ import { ItemTextureFile } from "./types/item/item_texture.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @class Item
+ * @example
+ * ```ts
+ * import { Item } from "@scriptmc/jsonts";
+ *
+ * const item = new Item();
+ *
+ * item.setIdentifier("id:name");
+ * item.setMenuCategory("items");
+ *
+ * item.addComponent("minecraft:icon", "itemTexture");
+ * item.addComponent("minecraft:display_name", { value: "name" });
+ *
+ * item.setTexture("itemTexture", "textures/items/item_texture");
+ *
+ * item.create();
+ * ```
+ */
 export class Item {
   private data: item = {
     format_version: "1.21.90",
@@ -20,6 +39,16 @@ export class Item {
     texture_data: {},
   };
   private name: string = "";
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { Item } from "@scriptmc/jsonts";
+   * const item = new Item();
+   * item.setIdentifier("id:name");
+   * item.create();
+   * ```
+   */
   setIdentifier(value: string) {
     if (!value.match(/[a-zA-Z]+:\w+|@name<\w+>/))
       throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
@@ -31,6 +60,18 @@ export class Item {
       .replace(/[>]/g, "");
     return this;
   }
+  /**
+   * @param category Category <string>
+   * @param group Group <string> (optional)
+   * @param is_hidden_in_commands boolean (optional)
+   * @example
+   * ```ts
+   * import { Item } from "@scriptmc/jsonts";
+   * const item = new Item();
+   * item.setMenuCategory("items", "ItemGroup.name.anvil");
+   * item.create();
+   * ```
+   */
   setMenuCategory(
     category: Category,
     group?: Group,
@@ -43,15 +84,48 @@ export class Item {
     };
     return this;
   }
+  /**
+   * @param value boolean
+   * @example
+   * ```ts
+   * import { Item } from "@scriptmc/jsonts";
+   * const item = new Item();
+   * item.setIsExperimental(true);
+   * item.create();
+   * ```
+   */
   setIsExperimental(value: boolean) {
     this.data["minecraft:item"].description.is_experimental = value;
     return this;
   }
+  /**
+   * @param name string
+   * @param value string
+   * @example
+   * ```ts
+   * import { Item } from "@scriptmc/jsonts";
+   * const item = new Item();
+   * item.setTexture("custom_item", "textures/items/custom_item");
+   * item.create();
+   * ```
+   */
   setTexture(name: string, value: string) {
     this.item_texture.texture_data = {};
     this.item_texture.texture_data[name] = { textures: value };
     return this;
   }
+  /**
+   * @param name Component <string>
+   * @param value Component[name]
+   * @example
+   * ```ts
+   * import { Item } from "@scriptmc/jsonts";
+   * const item = new Item();
+   * item.addComponent("minecraft:icon", "texture");
+   * item.addComponent("minecraft:display_name", { value: "name" });
+   * item.create();
+   * ```
+   */
   addComponent<Item extends keyof Component | (string & {})>(
     name: Item,
     // @ts-expect-error
