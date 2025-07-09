@@ -86,6 +86,15 @@ export class Entity {
     },
   };
   private name: string = "";
+  constructor() {
+    const err = new Error();
+    const stack = err.stack?.split("\n")[2] ?? "";
+    const match =
+      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
+    const filePath = match?.[1];
+    if (!filePath?.endsWith(".jt.js"))
+      throw new Error("can only be called in files .jt.ts");
+  }
   /**
    * @param value string
    * @example
@@ -574,9 +583,7 @@ export class Entity {
     value: ComponentGroups[Entity]
   ) {
     if (
-      !Object.keys(this.dataBP["minecraft:entity"].description).includes(
-        "component_groups"
-      )
+      !Object.keys(this.dataBP["minecraft:entity"]).includes("component_groups")
     )
       this.dataBP["minecraft:entity"].component_groups = {};
     this.dataBP["minecraft:entity"].component_groups![name] = value;

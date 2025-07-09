@@ -69,6 +69,15 @@ export class Block {
   };
   private blocks: { [key: string]: object } = {};
   private name: string = "";
+  constructor() {
+    const err = new Error();
+    const stack = err.stack?.split("\n")[2] ?? "";
+    const match =
+      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
+    const filePath = match?.[1];
+    if (!filePath?.endsWith(".jt.js"))
+      throw new Error("can only be called in files .jt.ts");
+  }
   /**
    * @param value string
    * @example
