@@ -29,6 +29,10 @@ import {
   RenderControllers,
   Scale,
 } from "./types/entity/render_controllers.js";
+import {
+  AnimationState,
+  AnimationController as AnimControl,
+} from "./types/entity/animation_controller.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -693,19 +697,30 @@ export class RenderController {
   };
   private name: string = "";
   private fileName: string = "";
+  constructor() {
+    const err = new Error();
+    const stack = err.stack?.split("\n")[2] ?? "";
+    const match =
+      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
+    const filePath = match?.[1];
+    if (!filePath?.endsWith(".jt.js"))
+      throw new Error("can only be called in files .jt.ts");
+  }
   /**
    * @param value string
    * @example
    * ```ts
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
-   * render.setIdentifier("id:name");
+   * render.setIdentifier("controller.render.name");
    * render.create();
    * ```
    */
   setIdentifier(value: string) {
     if (!value.match(/controller\.render\.\w+|@name<\w+>/))
-      throw new Error(`Identifier "${value}" invalid. ex: "id:name"`);
+      throw new Error(
+        `Identifier "${value}" invalid. ex: "controller.render.name"`
+      );
     this.fileName = value.match(/.*@name<.*>.*/)
       ? value.match(/.*@name<([^>/]*).*/)![1]
       : value;
@@ -983,6 +998,145 @@ export class RenderController {
         path.join(
           __dirname,
           `../../executes/reh/render_controllers/${this.fileName}.json`
+        ),
+        JSON.stringify(this.data)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+
+/**
+ * @class AnimationController
+ * @example
+ * ```ts
+ * import { AnimationController } from "@scriptmc/jsonts";
+ *
+ * const anim = new AnimationController();
+ *
+ * anim.setIdentifier("controller.animation.name");
+ * anim.setInitialState("default");
+ * anim.addState("default", {
+ *  transitions: [
+ *    {
+ *      "move": "query.is_moving"
+ *    }
+ *  ]
+ * });
+ * anim.addState("move", {
+ *  animations: ["move"],
+ *  transitions: [
+ *    {
+ *      "default": "!query.is_moving"
+ *    }
+ *  ]
+ * });
+ *
+ * anim.create();
+ * ```
+ */
+export class AnimationController {
+  private data: AnimControl = {
+    format_version: "1.10.0",
+    animation_controllers: {},
+  };
+  private name: string = "";
+  private fileName: string = "";
+  constructor() {
+    const err = new Error();
+    const stack = err.stack?.split("\n")[2] ?? "";
+    const match =
+      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
+    const filePath = match?.[1];
+    if (!filePath?.endsWith(".jt.js"))
+      throw new Error("can only be called in files .jt.ts");
+  }
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { AnimationController } from "@scriptmc/jsonts";
+   * const anim = new AnimationController();
+   * anim.setIdentifier("controller.animation.name");
+   * anim.create();
+   * ```
+   */
+  setIdentifier(value: string) {
+    if (!value.match(/controller\.animation\.\w+|@name<\w+>/))
+      throw new Error(
+        `Identifier "${value}" invalid. ex: "controller.animation.name"`
+      );
+    this.fileName = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1]
+      : value;
+    this.name = value.replace(/@name[<]/g, "").replace(/[>]/g, "");
+    this.data.animation_controllers![
+      value.replace(/@name[<]/g, "").replace(/[>]/g, "")
+    ] = {
+      states: {},
+    };
+    return this;
+  }
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { AnimationController } from "@scriptmc/jsonts";
+   * const anim = new AnimationController();
+   * anim.setInitialState("name");
+   * anim.create();
+   * ```
+   */
+  setInitialState(value: string) {
+    this.data.animation_controllers[this.name].initial_state = value;
+    return this;
+  }
+  /**
+   * @param name string
+   * @param value AnimationState <object>
+   * @example
+   * ```ts
+   * import { AnimationController } from "@scriptmc/jsonts";
+   * const anim = new AnimationController();
+   * anim.addState("name", {
+   *  animations: ["name"],
+   *  transitions: [
+   *    {
+   *      "name2": "query.value"
+   *    }
+   *  ]
+   * });
+   * anim.addState("name2", {
+   *  animations: ["name2"],
+   *  transitions: [
+   *    {
+   *      "name": "query.value"
+   *    }
+   *  ]
+   * });
+   * anim.create();
+   * ```
+   */
+  addState(name: string, value: AnimationState) {
+    this.data.animation_controllers[this.name].states[name] = value;
+    return this;
+  }
+  async create() {
+    try {
+      if (!this.name) throw new Error("Identifier not found.");
+      if (
+        !fs.existsSync(
+          path.join(__dirname, "../../executes/reh/animation_controllers")
+        )
+      )
+        fs.mkdirSync(
+          path.join(__dirname, "../../executes/reh/animation_controllers")
+        );
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          `../../executes/reh/animation_controllers/${this.fileName}.json`
         ),
         JSON.stringify(this.data)
       );
