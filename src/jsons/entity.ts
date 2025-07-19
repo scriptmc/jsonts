@@ -1063,7 +1063,7 @@ export class AnimationController {
    * ```
    */
   setIdentifier(value: string) {
-    if (!value.match(/controller\.animation\.\w+|@name<\w+>/))
+    if (!value.match(/controller\.animation\.\w+|@name<[\w\.]+>/))
       throw new Error(
         `Identifier "${value}" invalid. ex: "controller.animation.name"`
       );
