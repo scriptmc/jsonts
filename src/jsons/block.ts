@@ -77,6 +77,7 @@ export class Block {
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
       throw new Error("can only be called in files .jt.ts");
+    setTimeout(() => this.create(), 1000);
   }
   /**
    * @param value string
@@ -251,7 +252,7 @@ export class Block {
     this.data["minecraft:block"].permutations?.push({ condition, components });
     return this;
   }
-  async create() {
+  private async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
       if (!fs.existsSync(path.join(__dirname, "../../executes/beh/blocks")))

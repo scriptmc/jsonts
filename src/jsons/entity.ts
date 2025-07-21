@@ -98,6 +98,7 @@ export class Entity {
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
       throw new Error("can only be called in files .jt.ts");
+    setTimeout(() => this.create(), 1000);
   }
   /**
    * @param value string
@@ -644,7 +645,7 @@ export class Entity {
     this.dataBP["minecraft:entity"].events[name] = value;
     return this;
   }
-  async create() {
+  private async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
       if (!fs.existsSync(path.join(__dirname, "../../executes/beh/entities")))
@@ -705,6 +706,7 @@ export class RenderController {
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
       throw new Error("can only be called in files .jt.ts");
+    setTimeout(() => this.create(), 1000);
   }
   /**
    * @param value string
@@ -983,7 +985,7 @@ export class RenderController {
     this.data["render_controllers"]![this.name].textures?.push(value);
     return this;
   }
-  async create() {
+  private async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
       if (
@@ -1051,6 +1053,7 @@ export class AnimationController {
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
       throw new Error("can only be called in files .jt.ts");
+    setTimeout(() => this.create(), 1000);
   }
   /**
    * @param value string
@@ -1122,7 +1125,7 @@ export class AnimationController {
     this.data.animation_controllers[this.name].states[name] = value;
     return this;
   }
-  async create() {
+  private async create() {
     try {
       if (!this.name) throw new Error("Identifier not found.");
       if (

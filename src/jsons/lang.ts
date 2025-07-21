@@ -34,7 +34,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  */
 export class Lang {
   private data: string[] = [];
-  constructor() {
+  constructor(name: Languages) {
     const err = new Error();
     const stack = err.stack?.split("\n")[2] ?? "";
     const match =
@@ -42,6 +42,7 @@ export class Lang {
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
       throw new Error("can only be called in files .jt.ts");
+    setTimeout(() => this.create(name), 1000);
   }
   /**
    * @param name string
@@ -59,7 +60,7 @@ export class Lang {
     this.data.push(`${name}=${value}`);
     return this;
   }
-  async create(name: Languages) {
+  private async create(name: Languages) {
     try {
       if (!fs.existsSync(path.join(__dirname, "../../executes/reh/texts")))
         fs.mkdirSync(path.join(__dirname, "../../executes/reh/texts"));
