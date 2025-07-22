@@ -29,7 +29,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *
  * item.setTexture("itemTexture", "textures/items/item_texture");
  *
- * item.create();
  * ```
  */
 export class Lang {
@@ -41,7 +40,7 @@ export class Lang {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(name), 1000);
   }
   /**
@@ -53,7 +52,6 @@ export class Lang {
    *
    * const lang = new Lang();
    * lang.addLang("item.name", "Name");
-   * lang.create("en_US");
    * ```
    */
   addLang(name: string, value: string) {

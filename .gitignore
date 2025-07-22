@@ -17,5 +17,4 @@ coverage/
 
 src/jsons/types
 example.ts
-executes
-build.tsl
+commands

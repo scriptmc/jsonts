@@ -27,7 +27,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *
  * item.setTexture("itemTexture", "textures/items/item_texture");
  *
- * item.create();
  * ```
  */
 export class Item {
@@ -51,7 +50,7 @@ export class Item {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
@@ -61,7 +60,7 @@ export class Item {
    * import { Item } from "@scriptmc/jsonts";
    * const item = new Item();
    * item.setIdentifier("id:name");
-   * item.create();
+
    * ```
    */
   setIdentifier(value: string) {
@@ -84,7 +83,7 @@ export class Item {
    * import { Item } from "@scriptmc/jsonts";
    * const item = new Item();
    * item.setMenuCategory("items", "ItemGroup.name.anvil");
-   * item.create();
+
    * ```
    */
   setMenuCategory(
@@ -106,7 +105,7 @@ export class Item {
    * import { Item } from "@scriptmc/jsonts";
    * const item = new Item();
    * item.setIsExperimental(true);
-   * item.create();
+
    * ```
    */
   setIsExperimental(value: boolean) {
@@ -121,7 +120,7 @@ export class Item {
    * import { Item } from "@scriptmc/jsonts";
    * const item = new Item();
    * item.setTexture("custom_item", "textures/items/custom_item");
-   * item.create();
+
    * ```
    */
   setTexture(name: string, value: string) {
@@ -138,7 +137,7 @@ export class Item {
    * const item = new Item();
    * item.addComponent("minecraft:icon", "texture");
    * item.addComponent("minecraft:display_name", { value: "name" });
-   * item.create();
+
    * ```
    */
   addComponent<Item extends keyof Component | (string & {})>(
@@ -185,7 +184,7 @@ export class Attachable {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
@@ -195,7 +194,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.setIdentifier("id:name");
-   * att.create();
    * ```
    */
   setIdentifier(value: string) {
@@ -217,7 +215,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addMaterial("default", "entity_alphatest");
-   * att.create();
    * ```
    */
   addMaterial(name: string, value: Material | (string & {})) {
@@ -239,7 +236,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addTexture("default", "textures/items/custom_item");
-   * att.create();
    * ```
    */
   addTexture(name: string, value: string) {
@@ -260,7 +256,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addGeometry("default", "geometry.item");
-   * att.create();
    * ```
    */
   addGeometry(name: string, value: string) {
@@ -280,7 +275,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addRenderController("controller.render.item");
-   * att.create();
    * ```
    */
   addRenderController(value: string) {
@@ -303,7 +297,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addAnimationController("name", "controller.animation.name");
-   * att.create();
    * ```
    */
   addAnimationController(name: string, value: string) {
@@ -348,7 +341,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addItem("name", "value");
-   * att.create();
    * ```
    */
   addItem(name: string, value: string) {
@@ -369,7 +361,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addParticleEffects("name", "value");
-   * att.create();
    * ```
    */
   addParticleEffects(name: string, value: string) {
@@ -391,7 +382,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addParticleEmitters("name", "value");
-   * att.create();
    * ```
    */
   addParticleEmitters(name: string, value: string) {
@@ -413,7 +403,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addScript("animate", ["name"]);
-   * att.create();
    * ```
    */
   addScript<Script extends keyof Scripts>(
@@ -437,7 +426,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.addSoundEffect("name");
-   * att.create();
    * ```
    */
   addSoundEffect(value: string) {
@@ -457,7 +445,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.setEnableAttachables(true);
-   * att.create();
    * ```
    */
   setEnableAttachables(value: boolean) {
@@ -471,7 +458,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.setMinEngineVersion("value");
-   * att.create();
    * ```
    */
   setMinEngineVersion(value: string) {
@@ -488,7 +474,6 @@ export class Attachable {
    * import { Attachable } from "@scriptmc/jsonts";
    * const att = new Attachable();
    * att.setSpawnEgg("#288483", "#2B7135");
-   * att.create();
    * ```
    */
   setSpawnEgg(

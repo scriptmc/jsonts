@@ -30,9 +30,13 @@ import {
   Scale,
 } from "./types/entity/render_controllers.js";
 import {
-  AnimationState,
-  AnimationController as AnimControl,
-} from "./types/entity/animation_controller.js";
+  AnimationState as AnimStateRP,
+  AnimationController as AnimControlRP,
+} from "./types/entity/animation_controller_rp.js";
+import {
+  AnimationState as AnimStateBP,
+  AnimationController as AnimControlBP,
+} from "./types/entity/animation_controller_bp.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -71,7 +75,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * entity.addRenderController("controller.render.name");
  * entity.setSpawnEgg("#288483", "#2B7135");
  *
- * entity.create();
  * ```
  */
 export class Entity {
@@ -97,7 +100,7 @@ export class Entity {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
@@ -107,7 +110,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setIdentifier("id:name");
-   * entity.create();
+
    * ```
    */
   setIdentifier(value: string) {
@@ -131,7 +134,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setSpawnable(true);
-   * entity.create();
+
    * ```
    */
   setSpawnable(value: boolean) {
@@ -145,7 +148,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setSummonable(true);
-   * entity.create();
+
    * ```
    */
   setSummonable(value: boolean) {
@@ -159,7 +162,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setIsExperimental(true);
-   * entity.create();
+
    * ```
    */
   setIsExperimental(value: boolean) {
@@ -173,7 +176,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setSpawnCategory("creature");
-   * entity.create();
+
    * ```
    */
   setSpawnCategory(value: SpawnCategory) {
@@ -187,7 +190,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setRuntimeIdentifier("name");
-   * entity.create();
+
    * ```
    */
   setRuntimeIdentifier(value: string) {
@@ -204,7 +207,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setSpawnEgg("#288483", "#2B7135");
-   * entity.create();
+
    * ```
    */
   setSpawnEgg(
@@ -228,7 +231,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setHideArmor(true);
-   * entity.create();
+
    * ```
    */
   setHideArmor(value: boolean) {
@@ -242,7 +245,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setEnableAttachbles(true);
-   * entity.create();
+
    * ```
    */
   setEnableAttachbles(value: boolean) {
@@ -257,7 +260,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setHeldItemIgnoresLighting(true);
-   * entity.create();
+
    * ```
    */
   setHeldItemIgnoresLighting(value: boolean) {
@@ -273,7 +276,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setMinEngineVersion("1.21.90");
-   * entity.create();
+
    * ```
    */
   setMinEngineVersion(value: string) {
@@ -288,7 +291,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.setQueryabkeGeometry("name");
-   * entity.create();
+
    * ```
    */
   setQueryableGeometry(value: string) {
@@ -304,7 +307,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addParticleEmitter("name", "name");
-   * entity.create();
+
    * ```
    */
   addParticleEmitter(name: string, value: string) {
@@ -327,7 +330,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addSoundEffect("name", "name");
-   * entity.create();
+
    * ```
    */
   addSoundEffect(name: string, value: string) {
@@ -349,7 +352,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addMaterial("default", "entity_custom");
-   * entity.create();
+
    * ```
    */
   addMaterial(name: string, value: Material | (string & {})) {
@@ -371,7 +374,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addTexture("default", "textures/entity/custom_entity");
-   * entity.create();
+
    * ```
    */
   addTexture(name: string, value: string) {
@@ -392,7 +395,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addGeometry("default", "geometry.entity");
-   * entity.create();
+
    * ```
    */
   addGeometry(name: string, value: string) {
@@ -413,7 +416,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addAnimationRP("name", "animation.name");
-   * entity.create();
+
    * ```
    */
   addAnimationRP(name: string, value: string) {
@@ -435,7 +438,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addParticleEffects("name", "name");
-   * entity.create();
+
    * ```
    */
   addParticleEffects(name: string, value: string) {
@@ -457,7 +460,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addScriptRP("animate", ["name"]);
-   * entity.create();
+
    * ```
    */
   addScriptRP<Script extends keyof ScriptsRP>(
@@ -480,7 +483,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addRenderController("controller.render.entity");
-   * entity.create();
+
    * ```
    */
   addRenderController(value: string) {
@@ -508,7 +511,7 @@ export class Entity {
    *  default: "(0.0)",
    *  client_sync: false
    * });
-   * entity.create();
+
    * ```
    */
   addProperty<Property extends string>(
@@ -532,7 +535,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addAnimationBP("name", "animation.name");
-   * entity.create();
+
    * ```
    */
   addAnimationBP(name: string, value: string) {
@@ -553,7 +556,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addScriptBP("animate", ["name"]);
-   * entity.create();
+
    * ```
    */
   addScriptBP<Script extends keyof Scripts | (string & {})>(
@@ -580,7 +583,7 @@ export class Entity {
    * entity.addComponentGroup("physics", {
    *  "minecraft:physics": { has_collision: true, has_gravity: true },
    * });
-   * entity.create();
+
    * ```
    */
   addComponentGroup<Entity extends keyof ComponentGroups>(
@@ -602,7 +605,7 @@ export class Entity {
    * import { Entity } from "@scriptmc/jsonts";
    * const entity = new Entity();
    * entity.addComponent("minecraft:nameable", { always_show: true });
-   * entity.create();
+
    * ```
    */
   addComponent<Entity extends keyof Component | (string & {})>(
@@ -631,7 +634,7 @@ export class Entity {
    *    component_groups: "physics",
    *  },
    * });
-   * entity.create();
+
    * ```
    */
   addEvent<Entity extends keyof Events | (string & {})>(
@@ -705,7 +708,7 @@ export class RenderController {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
@@ -715,7 +718,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setIdentifier("controller.render.name");
-   * render.create();
    * ```
    */
   setIdentifier(value: string) {
@@ -739,7 +741,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setGeometry("geometry.default");
-   * render.create();
    * ```
    */
   setGeometry(value: string) {
@@ -757,7 +758,6 @@ export class RenderController {
    *    "name": ["geometry.1", "geometry.2"]
    *  }
    * });
-   * render.create();
    * ```
    */
   setArray(array: Arrays) {
@@ -774,7 +774,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setColor(0, 255, 0, 1);
-   * render.create();
    * ```
    */
   setColor(r: R, g: G, b: B, a: A) {
@@ -793,7 +792,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setFilterLighting(true);
-   * render.create();
    * ```
    */
   setFilterLighting(value: boolean) {
@@ -807,7 +805,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setIgnoreLighting(true);
-   * render.create();
    * ```
    */
   setIgnoreLighting(value: boolean) {
@@ -824,7 +821,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setIsHurtColor(0, 255, 0, 1);
-   * render.create();
    * ```
    */
   setIsHurtColor(r: R, g: G, b: B, a: A) {
@@ -843,7 +839,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setLightColorMultiplier("(0.0)");
-   * render.create();
    * ```
    */
   setLightColorMultiplier(value: string | number) {
@@ -860,7 +855,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setOnFireColor(0, 255, 0, 1);
-   * render.create();
    * ```
    */
   setOnFireColor(r: R, g: G, b: B, a: A) {
@@ -882,7 +876,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setOverlayColor(0, 255, 0, 1);
-   * render.create();
    * ```
    */
   setOverlayColor(r: R, g: G, b: B, a: A) {
@@ -901,7 +894,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setRebuildAnimationMatrices(true);
-   * render.create();
    * ```
    */
   setRebuildAnimationMatrices(value: boolean) {
@@ -917,7 +909,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.setUvAnim([1, 1], [1, 1]);
-   * render.create();
    * ```
    */
   setUvAnim(offset: Offset, scale: Scale) {
@@ -938,7 +929,6 @@ export class RenderController {
    *    "*": "material.default"
    *  }
    * ]);
-   * render.create();
    * ```
    */
   setMaterial(material: Materials2) {
@@ -954,7 +944,6 @@ export class RenderController {
    * render.addPartVisibility({
    *  "name": true
    * });
-   * render.create();
    * ```
    */
   addPartVisibility(part_visibility: PartVisibility1) {
@@ -971,7 +960,6 @@ export class RenderController {
    * import { RenderController } from "@scriptmc/jsonts";
    * const render = new RenderController();
    * render.addTexture("texture.default");
-   * render.create();
    * ```
    */
   addTexture(value: string) {
@@ -1010,36 +998,32 @@ export class RenderController {
 }
 
 /**
- * @class AnimationController
+ * @class AnimationControllerBP
  * @example
  * ```ts
- * import { AnimationController } from "@scriptmc/jsonts";
+ * import { AnimationControllerBP } from "@scriptmc/jsonts";
  *
- * const anim = new AnimationController();
+ * const animBP = new AnimationControllerBP();
  *
- * anim.setIdentifier("controller.animation.name");
- * anim.setInitialState("default");
- * anim.addState("default", {
+ * animBP.setIdentifier("controller.animation.name");
+ * animBP.setInitialState("default");
+ * animBP.addState("default", {
  *  transitions: [
  *    {
- *      "move": "query.is_moving"
+ *      "name": "query.is_baby"
  *    }
  *  ]
  * });
- * anim.addState("move", {
- *  animations: ["move"],
- *  transitions: [
- *    {
- *      "default": "!query.is_moving"
- *    }
+ * animBP.addState("name", {
+ *  on_entry: [
+ *    "/give @s diamond"
  *  ]
  * });
  *
- * anim.create();
  * ```
  */
-export class AnimationController {
-  private data: AnimControl = {
+export class AnimationControllerBP {
+  private data: AnimControlBP = {
     format_version: "1.10.0",
     animation_controllers: {},
   };
@@ -1052,17 +1036,16 @@ export class AnimationController {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
    * @param value string
    * @example
    * ```ts
-   * import { AnimationController } from "@scriptmc/jsonts";
-   * const anim = new AnimationController();
-   * anim.setIdentifier("controller.animation.name");
-   * anim.create();
+   * import { AnimationControllerBP } from "@scriptmc/jsonts";
+   * const animBP = new AnimationControllerBP();
+   * animBP.setIdentifier("controller.animation.name");
    * ```
    */
   setIdentifier(value: string) {
@@ -1085,10 +1068,9 @@ export class AnimationController {
    * @param value string
    * @example
    * ```ts
-   * import { AnimationController } from "@scriptmc/jsonts";
-   * const anim = new AnimationController();
-   * anim.setInitialState("name");
-   * anim.create();
+   * import { AnimationControllerBP } from "@scriptmc/jsonts";
+   * const animBP = new AnimationControllerBP();
+   * animBP.setInitialState("name");
    * ```
    */
   setInitialState(value: string) {
@@ -1097,12 +1079,12 @@ export class AnimationController {
   }
   /**
    * @param name string
-   * @param value AnimationState <object>
+   * @param value AnimStateBP <object>
    * @example
    * ```ts
-   * import { AnimationController } from "@scriptmc/jsonts";
-   * const anim = new AnimationController();
-   * anim.addState("name", {
+   * import { AnimationControllerBP } from "@scriptmc/jsonts";
+   * const animBP = new AnimationControllerBP();
+   * animBP.addState("name", {
    *  animations: ["name"],
    *  transitions: [
    *    {
@@ -1110,7 +1092,140 @@ export class AnimationController {
    *    }
    *  ]
    * });
-   * anim.addState("name2", {
+   * animBP.addState("name2", {
+   *  on_entry: [
+   *    "/give @s diamond"
+   *  ]
+   * });
+   * ```
+   */
+  addState(name: string, value: AnimStateBP) {
+    this.data.animation_controllers[this.name].states[name] = value;
+    return this;
+  }
+  private async create() {
+    try {
+      if (!this.name) throw new Error("Identifier not found.");
+      if (
+        !fs.existsSync(
+          path.join(__dirname, "../../executes/beh/animation_controllers")
+        )
+      )
+        fs.mkdirSync(
+          path.join(__dirname, "../../executes/beh/animation_controllers")
+        );
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          `../../executes/beh/animation_controllers/${this.fileName}.json`
+        ),
+        JSON.stringify(this.data)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+
+/**
+ * @class AnimationControllerRP
+ * @example
+ * ```ts
+ * import { AnimationControllerRP } from "@scriptmc/jsonts";
+ *
+ * const animRP = new AnimationControllerRP();
+ *
+ * animRP.setIdentifier("controller.animation.name");
+ * animRP.setInitialState("default");
+ * animRP.addState("default", {
+ *  transitions: [
+ *    {
+ *      "move": "query.is_moving"
+ *    }
+ *  ]
+ * });
+ * animRP.addState("move", {
+ *  animations: ["move"],
+ *  transitions: [
+ *    {
+ *      "default": "!query.is_moving"
+ *    }
+ *  ]
+ * });
+ *
+ * ```
+ */
+export class AnimationControllerRP {
+  private data: AnimControlRP = {
+    format_version: "1.10.0",
+    animation_controllers: {},
+  };
+  private name: string = "";
+  private fileName: string = "";
+  constructor() {
+    const err = new Error();
+    const stack = err.stack?.split("\n")[2] ?? "";
+    const match =
+      stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
+    const filePath = match?.[1];
+    if (!filePath?.endsWith(".jt.js"))
+      throw new Error("can only be called in files .jt.js");
+    setTimeout(() => this.create(), 1000);
+  }
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { AnimationControllerRP } from "@scriptmc/jsonts";
+   * const anim = new AnimationControllerRP();
+   * animRP.setIdentifier("controller.animation.name");
+   * ```
+   */
+  setIdentifier(value: string) {
+    if (!value.match(/controller\.animation\.\w+|@name<[\w\.]+>/))
+      throw new Error(
+        `Identifier "${value}" invalid. ex: "controller.animation.name"`
+      );
+    this.fileName = value.match(/.*@name<.*>.*/)
+      ? value.match(/.*@name<([^>/]*).*/)![1]
+      : value;
+    this.name = value.replace(/@name[<]/g, "").replace(/[>]/g, "");
+    this.data.animation_controllers![
+      value.replace(/@name[<]/g, "").replace(/[>]/g, "")
+    ] = {
+      states: {},
+    };
+    return this;
+  }
+  /**
+   * @param value string
+   * @example
+   * ```ts
+   * import { AnimationControllerRP } from "@scriptmc/jsonts";
+   * const anim = new AnimationControllerRP();
+   * animRP.setInitialState("name");
+   * ```
+   */
+  setInitialState(value: string) {
+    this.data.animation_controllers[this.name].initial_state = value;
+    return this;
+  }
+  /**
+   * @param name string
+   * @param value AnimStateRP <object>
+   * @example
+   * ```ts
+   * import { AnimationControllerRP } from "@scriptmc/jsonts";
+   * const anim = new AnimationControllerRP();
+   * animRP.addState("name", {
+   *  animations: ["name"],
+   *  transitions: [
+   *    {
+   *      "name2": "query.value"
+   *    }
+   *  ]
+   * });
+   * animRP.addState("name2", {
    *  animations: ["name2"],
    *  transitions: [
    *    {
@@ -1118,10 +1233,9 @@ export class AnimationController {
    *    }
    *  ]
    * });
-   * anim.create();
    * ```
    */
-  addState(name: string, value: AnimationState) {
+  addState(name: string, value: AnimStateRP) {
     this.data.animation_controllers[this.name].states[name] = value;
     return this;
   }

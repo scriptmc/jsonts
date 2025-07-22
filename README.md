@@ -1,6 +1,6 @@
 # @SCRIPTMC/JSONTS
 
-A ScriptMC plugin to convert JavaScript files into valid Minecraft Bedrock JSONs for entities, items, and components.
+A ScriptMC plugin to convert JavaScript files into valid Minecraft Bedrock JSONs for entities, items, and more.
 
 ![npm](https://img.shields.io/npm/v/@scriptmc/jsonts)![license](https://img.shields.io/github/license/scriptmc/jsonts)
 
@@ -25,9 +25,13 @@ A ScriptMC plugin to convert JavaScript files into valid Minecraft Bedrock JSONs
 - Generate Minecraft Bedrock JSON from JavaScript
 - Support for:
 
-  - Enitities
-  - Components
-  - Items
+  - Enitities (RenderController and AnimationControllerBP/RP)
+  - Blocks
+  - Items (Attachables)
+  - Langs
+  - <abbr title="On Test">LootTables</abbr>
+  - <abbr title="On Test">Recipes</abbr>
+  - <abbr title="On Test">Ui</abbr>
 
 ## 📦 Installation
 

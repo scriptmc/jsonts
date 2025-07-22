@@ -17,7 +17,7 @@ export class Ui {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   setNamespace(value: string) {

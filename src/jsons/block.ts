@@ -50,7 +50,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  *  },
  * });
  *
- * block.create();
  * ```
  */
 export class Block {
@@ -76,7 +75,7 @@ export class Block {
       stack.match(/\((.*):\d+:\d+\)$/) || stack.match(/at (.*):\d+:\d+/);
     const filePath = match?.[1];
     if (!filePath?.endsWith(".jt.js"))
-      throw new Error("can only be called in files .jt.ts");
+      throw new Error("can only be called in files .jt.js");
     setTimeout(() => this.create(), 1000);
   }
   /**
@@ -86,7 +85,6 @@ export class Block {
    * import { Block } from "@scriptmc/jsonts";
    * const block = new Block();
    * block.setIdentifier("id:name");
-   * block.create();
    * ```
    */
   setIdentifier(value: string) {
@@ -109,7 +107,6 @@ export class Block {
    * import { Block } from "@scriptmc/jsonts";
    * const block = new Block();
    * block.setMenuCategory("construction", "itemGroup.name.anvil");
-   * block.create();
    * ```
    */
   setMenuCategory(
@@ -142,7 +139,6 @@ export class Block {
    *      enabled_states: ["minecraft:block_face", "minecraft:vertical_half"],
    *  },
    * });
-   * block.create();
    * ```
    */
   setTraits(value: Traits) {
@@ -159,7 +155,6 @@ export class Block {
    * block.addTexture("block_up", "textures/blocks/block_up");
    * block.addTexture("block_down", "textures/blocks/block_down");
    * block.addTexture("block_side", "textures/blocks/block_side");
-   * block.create();
    * ```
    */
   addTexture(name: string, value: string) {
@@ -182,7 +177,6 @@ export class Block {
    *    side: "block_side"
    *  }
    * });
-   * block.create();
    * ```
    */
   setBlock(name: string, value: block) {
@@ -198,7 +192,6 @@ export class Block {
    * import { Block } from "@scriptmc/jsonts";
    * const block = new Block();
    * block.addState("state:custom_state", [true, false]);
-   * block.create();
    * ```
    */
   addState(name: string, value: State) {
@@ -218,7 +211,6 @@ export class Block {
    * const block = new Block();
    * block.addComponent("minecraft:friction", 0.6);
    * block.addComponent("minecraft:map_color", "#00FF00");
-   * block.create();
    * ```
    */
   addComponent<Block extends keyof Component | (string & {})>(
@@ -243,7 +235,6 @@ export class Block {
    * block.addPermutation(`query.block_state("custom:is_lit") == false`, {
    *  "minecraft:light_emission": 0,
    * });
-   * block.create();
    * ```
    */
   addPermutation(condition: Condition, components: Component1) {
