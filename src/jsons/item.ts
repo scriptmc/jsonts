@@ -156,12 +156,12 @@ export class Item {
         fs.mkdirSync(path.join(__dirname, "../../executes/beh/items"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/beh/items/${this.name}.json`),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
       if (Object.keys(this.item_texture.texture_data!).length <= 0) return;
       fs.writeFileSync(
         path.join(__dirname, `../../executes/${this.name}.item_texture.json`),
-        JSON.stringify(this.item_texture)
+        JSON.stringify(this.item_texture, null, 2)
       );
     } catch (err) {
       console.error(err);
@@ -502,7 +502,7 @@ export class Attachable {
           __dirname,
           `../../executes/reh/attachables/${this.name}.json`
         ),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);

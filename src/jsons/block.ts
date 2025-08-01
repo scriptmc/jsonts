@@ -250,7 +250,7 @@ export class Block {
         fs.mkdirSync(path.join(__dirname, "../../executes/beh/blocks"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/beh/blocks/${this.name}.json`),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
       if (Object.keys(this.terrain_texture.texture_data!).length <= 0) return;
       fs.writeFileSync(
@@ -258,12 +258,12 @@ export class Block {
           __dirname,
           `../../executes/${this.name}.terrain_texture.json`
         ),
-        JSON.stringify(this.terrain_texture)
+        JSON.stringify(this.terrain_texture, null, 2)
       );
       if (Object.keys(this.blocks).length <= 0) return;
       fs.writeFileSync(
         path.join(__dirname, `../../executes/${this.name}.blocks.json`),
-        JSON.stringify(this.blocks)
+        JSON.stringify(this.blocks, null, 2)
       );
     } catch (err) {
       console.error(err);

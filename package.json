@@ -1,6 +1,6 @@
 {
   "name": "@scriptmc/jsonts",
-  "version": "1.3.0-test2",
+  "version": "1.3.0",
   "description": "A ScriptMC tool to convert JavaScript files into valid Minecraft Bedrock JSONs for entities, items, and more.",
   "license": "MIT",
   "author": "athumjs",

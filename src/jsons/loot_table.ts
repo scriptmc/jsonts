@@ -104,7 +104,7 @@ export class LootTable {
         fs.mkdirSync(path.join(__dirname, "../../executes/beh/loot_tables"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/beh/loot_tables/${name}.json`),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);

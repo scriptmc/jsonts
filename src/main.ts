@@ -22,7 +22,6 @@ export {
   AnimationControllerRP,
   Attachable,
   Query,
-  Ui,
   Recipe,
   LootTable,
 };

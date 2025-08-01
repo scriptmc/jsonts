@@ -101,7 +101,7 @@ export class Recipe {
         fs.mkdirSync(path.join(__dirname, "../../executes/beh/recipes"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/beh/recipes/${name}.json`),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);

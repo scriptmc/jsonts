@@ -36,7 +36,7 @@ export class Ui {
         fs.mkdirSync(path.join(__dirname, "../../executes/reh/ui"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/reh/ui/${this.name}.json`),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);

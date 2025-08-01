@@ -655,7 +655,7 @@ export class Entity {
         fs.mkdirSync(path.join(__dirname, "../../executes/beh/entities"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/beh/entities/${this.name}.json`),
-        JSON.stringify(this.dataBP)
+        JSON.stringify(this.dataBP, null, 2)
       );
       if (
         Object.keys(this.dataRP["minecraft:client_entity"].description)
@@ -666,7 +666,7 @@ export class Entity {
         fs.mkdirSync(path.join(__dirname, "../../executes/reh/entity"));
       fs.writeFileSync(
         path.join(__dirname, `../../executes/reh/entity/${this.name}.json`),
-        JSON.stringify(this.dataRP)
+        JSON.stringify(this.dataRP, null, 2)
       );
     } catch (err) {
       console.error(err);
@@ -989,7 +989,7 @@ export class RenderController {
           __dirname,
           `../../executes/reh/render_controllers/${this.fileName}.json`
         ),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);
@@ -1119,7 +1119,7 @@ export class AnimationControllerBP {
           __dirname,
           `../../executes/beh/animation_controllers/${this.fileName}.json`
         ),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);
@@ -1255,7 +1255,7 @@ export class AnimationControllerRP {
           __dirname,
           `../../executes/reh/animation_controllers/${this.fileName}.json`
         ),
-        JSON.stringify(this.data)
+        JSON.stringify(this.data, null, 2)
       );
     } catch (err) {
       console.error(err);
