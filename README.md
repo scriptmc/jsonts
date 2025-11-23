@@ -51,7 +51,7 @@ smc start
 
 ## 📓 License
 
-MIT &copy; 2025 [Athumjs](https://github.com/Athumjs)
+MIT &copy; 2025 [ScriptMC](https://github.com/ScriptMC)
 
 ---
 
